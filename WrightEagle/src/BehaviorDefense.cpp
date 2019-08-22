@@ -40,8 +40,13 @@
 #include "Dasher.h"
 #include "Logger.h"
 #include "BehaviorIntercept.h"
+#include "Utilities.h"
+#include <fstream>
+#include "qLearning.h"
+#include "PossibleActions.h"
+#include "PossibleStates.h"
 
-BehaviorDefensePlanner::BehaviorDefensePlanner(Agent & agent): BehaviorPlannerBase <BehaviorDefenseData>( agent )
+BehaviorDefensePlanner::BehaviorDefensePlanner(Agent &agent) : BehaviorPlannerBase<BehaviorDefenseData>(agent)
 {
 }
 
@@ -49,20 +54,167 @@ BehaviorDefensePlanner::~BehaviorDefensePlanner()
 {
 }
 
-void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> & behavior_list)
+void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> &behavior_list)
 {
-	BehaviorFormationPlanner(mAgent).Plan(behavior_list);
-	BehaviorBlockPlanner(mAgent).Plan(behavior_list);
-	BehaviorMarkPlanner(mAgent).Plan(behavior_list);
+	std::stringstream qTableString;
+	qTableString << "qTable" << mSelfState.GetUnum();
+	std::ifstream qTableFileIn(qTableString.str(), std::ios::binary);
+	double qTable[648][10];
+	qTableFileIn.read((char *)&qTable, sizeof(qTable));
+	qTableFileIn.close();
+	mAgent.lastPosition = mSelfState.GetPos();
+	mAgent.lastBallPosition = mWorldState.GetBall().GetPos();
+	//GETTING VARIABLES
+	double distToBall = mPositionInfo.GetBallDistToTeammate(mSelfState.GetUnum());
+	Unum closestTeammate = mPositionInfo.GetCloseTeammateToBall()[0];
+	double amITheClosest = closestTeammate == mSelfState.GetUnum();
+	double teammateDistToBall = amITheClosest ? distToBall : mPositionInfo.GetBallDistToTeammate(closestTeammate);
+	Unum opponent = mPositionInfo.GetOpponentWithBall();
+	Vector oppPosition = mWorldState.GetOpponent(opponent).GetPos();
+	Vector goaliePosition = mWorldState.GetTeammate(mWorldState.GetTeammateGoalieUnum()).GetPos();
+	Vector goalPosition(goaliePosition.X() > 0 ? 51.162 : -51.162, 0);
+	double oppDistToGoal = oppPosition.Dist(goalPosition);
+	double teammatesDistToOpp[10];
+	int index = 0;
+	double avgDist = 0;
+	for (int i = 1; i <= 11; i++)
+	{
+		if (i != mWorldState.GetTeammateGoalieUnum())
+		{
+			double aux = mWorldState.GetTeammate(i).GetPos().Dist(oppPosition);
+			teammatesDistToOpp[index++] = aux;
+		}
+	}
+	int n = sizeof(teammatesDistToOpp) / sizeof(teammatesDistToOpp[0]);
+	std::sort(teammatesDistToOpp, teammatesDistToOpp + (n));
+	avgDist = teammatesDistToOpp[0] + teammatesDistToOpp[1] + teammatesDistToOpp[2] + teammatesDistToOpp[3];
+	avgDist /= 4;
+	double sum = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		sum += (teammatesDistToOpp[i] - avgDist) * (teammatesDistToOpp[i] - avgDist);
+	}
+	double density = sqrt(sum / 4);
+	Vector ballPosition = mWorldState.GetBall().GetPos();
+	Vector position = mSelfState.GetPos();
+	bool north = ballPosition.Y() > position.Y();
+	bool west = ballPosition.X() < position.X();
 
-	if (!mActiveBehaviorList.empty()) {
+	int curState = GetState(distToBall, teammateDistToBall, amITheClosest, oppDistToGoal, density, north, west);
+	mAgent.lastStateOccurred = curState;
+
+	vector<double> actionSpace{qTable[curState][0], qTable[curState][1], qTable[curState][2], qTable[curState][3], qTable[curState][4], qTable[curState][5], qTable[curState][6], qTable[curState][7], qTable[curState][8]};
+	int actionToTake = greedyEpSelection(actionSpace, (1 - (qTable[curState][9] / 100000)));
+
+	//Uncomment to Trainning
+
+	//mAgent.lastActionTaken = actionToTake;
+
+	double power = mSelfState.CorrectDashPowerForStamina(ServerParam::instance().maxDashPower());
+	switch (actionToTake)
+	{
+	case MoveNorth:
+		if (mSelfState.GetPos().Y() + 2 <= 25)
+			Dasher::instance().GoToPoint(mAgent, Vector(mSelfState.GetPos().X(), mSelfState.GetPos().Y() + 10), 1.0, power, false, true);
+		break;
+	case MoveSouth:
+		if (mSelfState.GetPos().Y() - 2 >= -25)
+			Dasher::instance().GoToPoint(mAgent, Vector(mSelfState.GetPos().X(), mSelfState.GetPos().Y() - 10), 1.0, power, false, true);
+		break;
+	case MoveWest:
+		if (mSelfState.GetPos().X() - 2 >= -51)
+			Dasher::instance().GoToPoint(mAgent, Vector(mSelfState.GetPos().X() - 10, mSelfState.GetPos().Y()), 1.0, power, false, true);
+		break;
+	case MoveEast:
+		if (mSelfState.GetPos().X() + 2 >= 51)
+			Dasher::instance().GoToPoint(mAgent, Vector(mSelfState.GetPos().X() + 10, mSelfState.GetPos().Y()), 1.0, power, false, true);
+		break;
+	case MoveToBall:
+		Dasher::instance().GoToPoint(mAgent, ballPosition, 1.0, power, false, true);
+		break;
+	case InterceptAction:
+		BehaviorInterceptPlanner(mAgent).Plan(behavior_list);
+		break;
+	case BlockAction:
+		BehaviorBlockPlanner(mAgent).Plan(behavior_list);
+		break;
+	case MarkAction:
+		BehaviorMarkPlanner(mAgent).Plan(behavior_list);
+		break;
+	case StayStill:
+	default:
+		break;
+	}
+
+	// Uncomment to Trainning
+
+	// mAgent.lastActions.push_back(actionToTake);
+	// mAgent.lastActionsState.push_back(curState);
+	PlayMode pm = mWorldState.GetPlayMode();
+	ServerPlayMode spm = SPM_Null;
+	switch (pm)
+	{
+	case PM_Goal_Opps:
+		spm = SPM_Goal_Train;
+		break;
+	case PM_Captured:
+		spm = SPM_Captured;
+		break;
+	case PM_OutOfBounds:
+		spm = SPM_OutOfBounds;
+		break;
+	case PM_Play_On_11:
+		spm = SPM_PlayOn_11;
+		break;
+	case PM_Play_On_10:
+		spm = SPM_PlayOn_1;
+		break;
+	case PM_Play_On_9:
+		spm = SPM_PlayOn_9;
+		break;
+	case PM_Play_On_8:
+		spm = SPM_PlayOn_8;
+		break;
+	case PM_Play_On_7:
+		spm = SPM_PlayOn_7;
+		break;
+	case PM_Play_On_6:
+		spm = SPM_PlayOn_6;
+		break;
+	case PM_Play_On_5:
+		spm = SPM_PlayOn_5;
+		break;
+	case PM_Play_On_4:
+		spm = SPM_PlayOn_4;
+		break;
+	case PM_Play_On_3:
+		spm = SPM_PlayOn_3;
+		break;
+	case PM_Play_On_2:
+		spm = SPM_PlayOn_2;
+		break;
+	case PM_Play_On_1:
+		spm = SPM_PlayOn_1;
+		break;
+	default:
+		break;
+	}
+
+	// Uncomment to trainning
+
+	// mAgent.lastActionsPM.push_back(spm);
+	// mAgent.cycleCounter++;
+	if (!mActiveBehaviorList.empty())
+	{
 		mActiveBehaviorList.sort(std::greater<ActiveBehavior>());
 		behavior_list.push_back(mActiveBehaviorList.front());
 
-		if (mActiveBehaviorList.size() > 1) { //允许非最优行为提交视觉请求
+		if (mActiveBehaviorList.size() > 1)
+		{ //允许非最优行为提交视觉请求
 			double plus = 1.0;
 			ActiveBehaviorPtr it = mActiveBehaviorList.begin();
-			for (++it; it != mActiveBehaviorList.end(); ++it) {
+			for (++it; it != mActiveBehaviorList.end(); ++it)
+			{
 				it->SubmitVisualRequest(plus);
 				plus *= 2.0;
 			}

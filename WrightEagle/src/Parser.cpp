@@ -1527,7 +1527,7 @@ void Parser::ParseOkMsg(char *msg)
 void Parser::ParsePlayMode(char *msg)
 {
 	ServerPlayMode spm = ServerPlayModeMap::instance().GetServerPlayMode(msg);
-
+	// std::cout << msg << '\n';
 	if( spm == SPM_Null ){
 		PRINT_ERROR("unknown server play mode: " << msg << " @ " << mpObserver->CurrentTime());
 		return;
@@ -1536,6 +1536,9 @@ void Parser::ParsePlayMode(char *msg)
 	PlayMode pm = PM_No_Mode;
 	mpObserver->SetServerPlayMode(spm);
 	switch( spm ){
+	case SPM_Goal_Train:
+		pm = PM_Goal_Opps;
+		break;
 	case SPM_PlayOn:
 		pm = PM_Play_On;
 		break;           /* play_on */
@@ -1697,6 +1700,45 @@ void Parser::ParsePlayMode(char *msg)
 		break;
 	case SPM_Foul_Charge_Right:
 		pm = ( mpObserver->OurInitSide() == 'l' ) ? PM_Our_Foul_Charge_Kick : PM_Opp_Foul_Charge_Kick;
+		break;
+	case SPM_Captured:
+		pm = PM_Captured;
+		break;
+	case SPM_OutOfBounds:
+		pm = PM_OutOfBounds;
+		break;
+	case SPM_PlayOn_1:
+		pm = PM_Play_On_1;
+		break;
+	case SPM_PlayOn_2:
+		pm = PM_Play_On_2;
+		break;
+	case SPM_PlayOn_3:
+		pm = PM_Play_On_3;
+		break;
+	case SPM_PlayOn_4:
+		pm = PM_Play_On_4;
+		break;
+	case SPM_PlayOn_5:
+		pm = PM_Play_On_5;
+		break;
+	case SPM_PlayOn_6:
+		pm = PM_Play_On_6;
+		break;
+	case SPM_PlayOn_7:
+		pm = PM_Play_On_7;
+		break;
+	case SPM_PlayOn_8:
+		pm = PM_Play_On_8;
+		break;
+	case SPM_PlayOn_9:
+		pm = PM_Play_On_9;
+		break;
+	case SPM_PlayOn_10:
+		pm = PM_Play_On_10;
+		break;
+	case SPM_PlayOn_11:
+		pm = PM_Play_On_11;
 		break;
 	default:
 		PRINT_ERROR("unknown server play mode: " << msg << " @ " << mpObserver->CurrentTime());

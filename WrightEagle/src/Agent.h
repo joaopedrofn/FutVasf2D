@@ -40,6 +40,7 @@
 #include "Strategy.h"
 #include "Analyser.h"
 #include "Formation.h"
+#include <vector>
 
 class WorldModel;
 class ActiveBehavior;
@@ -47,24 +48,30 @@ class ActiveBehavior;
 /**
  * Identifies an agent.
  */
-struct AgentID {
-	Unum     mAgentUnum; //总是为正
-	Time     mCurrentTime;
-	bool     mReverse;
+struct AgentID
+{
+	Unum mAgentUnum; //总是为正
+	Time mCurrentTime;
+	bool mReverse;
 
-	AgentID(Unum unum = 0, Time time = Time(-3, 0), bool reverse = false): mAgentUnum(unum), mCurrentTime(time), mReverse(reverse){}
-	bool operator == (const AgentID & o){
+	AgentID(Unum unum = 0, Time time = Time(-3, 0), bool reverse = false) : mAgentUnum(unum), mCurrentTime(time), mReverse(reverse) {}
+	bool operator==(const AgentID &o)
+	{
 		return mCurrentTime == o.mCurrentTime && mAgentUnum == o.mAgentUnum && mReverse == o.mReverse;
 	}
-	bool operator != (const AgentID & o){
+	bool operator!=(const AgentID &o)
+	{
 		return !(*this == o);
 	}
 
-	friend std::ostream & operator<<(std::ostream & os, const AgentID & o) {
-		if (o.mReverse) {
+	friend std::ostream &operator<<(std::ostream &os, const AgentID &o)
+	{
+		if (o.mReverse)
+		{
 			return os << '-' << o.mAgentUnum;
 		}
-		else {
+		else
+		{
 			return os << '+' << o.mAgentUnum;
 		}
 	}
@@ -82,38 +89,57 @@ class Agent
 
 public:
 	virtual ~Agent();
+	std::vector<int> lastActions;
+	std::vector<int> lastActionsState;
+	std::vector<ServerPlayMode> lastActionsPM;
+	int cycleCounter = 0;
+	int lastStateOccurred = -1;
+	int lastActionTaken;
+	Vector lastBallPosition;
+	Vector lastPosition;
+	double lastGoalDist;
+	double lastPlayerDist;
+	int generalCycleCounter = 0;
+	int goalCounter = 0;
+	int countDone = 0;
+
+	void lockQTable();
+	void unlockQTable();
+	int isQTableLocked();
 
 	/**
 	 * Interface to create an agent which represents a team mate.
 	 */
-	Agent * CreateTeammateAgent(Unum unum); ///反算队友
+	Agent *CreateTeammateAgent(Unum unum); ///反算队友
 
 	/**
 	 * Interface to create an agent which represents an opponent.
 	 */
-	Agent * CreateOpponentAgent(Unum unum); ///反算对手
+	Agent *CreateOpponentAgent(Unum unum); ///反算对手
 
 	/**
 	 * Interfaces to get the agent's world state.
 	 */
-	WorldState       & World() { return *mpWorldState; }
-	const WorldState & GetWorldState() const { return *mpWorldState; }
+	WorldState &World() { return *mpWorldState; }
+	const WorldState &GetWorldState() const { return *mpWorldState; }
 
 	/**
 	 * Interfaces to get the agent's info state.
 	 */
-	InfoState        & Info() {	return *mpInfoState; }
-	const InfoState  & GetInfoState() const { return *mpInfoState; }
+	InfoState &Info() { return *mpInfoState; }
+	const InfoState &GetInfoState() const { return *mpInfoState; }
 
 	/**
 	 * 自己相关的接口
 	 * Interfaces to get information about the agent it self.
 	 */
-	AgentID             GetAgentID() const { return AgentID(mSelfUnum, GetWorldState().CurrentTime(), mReverse); }
-	Unum                GetSelfUnum() const { return mSelfUnum; }
+	AgentID GetAgentID() const { return AgentID(mSelfUnum, GetWorldState().CurrentTime(), mReverse); }
+	Unum GetSelfUnum() const { return mSelfUnum; }
 
-	const PlayerState & GetSelf() const {
-		if (!mSelfUnum || mSelfUnum == TRAINER_UNUM) {
+	const PlayerState &GetSelf() const
+	{
+		if (!mSelfUnum || mSelfUnum == TRAINER_UNUM)
+		{
 			static PlayerState coach; //dummy player state for coach
 			return coach;
 		}
@@ -121,8 +147,10 @@ public:
 		return GetWorldState().GetTeammate(mSelfUnum);
 	}
 
-	PlayerState & Self() {
-		if (!mSelfUnum || mSelfUnum == TRAINER_UNUM) {
+	PlayerState &Self()
+	{
+		if (!mSelfUnum || mSelfUnum == TRAINER_UNUM)
+		{
 			static PlayerState coach; //dummy player state for coach
 			return coach;
 		}
@@ -169,18 +197,20 @@ public:
 	bool ChangePlayerType(std::string teamname, Unum num, int player_type) { return GetActionEffector().SetChangePlayerTypeAction(teamname, num, player_type); }
 	bool Start() { return GetActionEffector().SetStartAction(); }
 	bool ChangePlayMode(ServerPlayMode spm) { return GetActionEffector().SetChangePlayModeAction(spm); }
-	bool MoveBall(Vector pos, Vector vel) { return GetActionEffector().SetMoveBallAction(pos,vel); }
+	bool MoveBall(Vector pos, Vector vel) { return GetActionEffector().SetMoveBallAction(pos, vel); }
 	bool MovePlayer(std::string teamname, Unum num, Vector pos, Vector vel, AngleDeg dir) { return GetActionEffector().SetMovePlayerAction(teamname, num, pos, vel, dir); }
-	bool Look(){ return GetActionEffector().SetLookAction(); }
-	bool TeamNames(){ return GetActionEffector().SetTeamNamesAction(); }
-	bool Recover(){ return GetActionEffector().SetRecoverAction(); }
-	bool CheckBall(){ return GetActionEffector().SetCheckBallAction(); }
+	bool Look() { return GetActionEffector().SetLookAction(); }
+	bool TeamNames() { return GetActionEffector().SetTeamNamesAction(); }
+	bool Recover() { return GetActionEffector().SetRecoverAction(); }
+	bool CheckBall() { return GetActionEffector().SetCheckBallAction(); }
 
 	/**
 	 * Get ActionEffector of this agent.
 	 */
-	ActionEffector & GetActionEffector() {
-		if (mpActionEffector == 0){
+	ActionEffector &GetActionEffector()
+	{
+		if (mpActionEffector == 0)
+		{
 			mpActionEffector = new ActionEffector(*this);
 		}
 		return *mpActionEffector;
@@ -189,24 +219,24 @@ public:
 	/**
 	 * Get Formation of this agent.
 	 */
-	Formation & GetFormation()
-    {
-        if (mpFormation == 0)
-        {
-            mpFormation = new Formation(*this);
-        }
+	Formation &GetFormation()
+	{
+		if (mpFormation == 0)
+		{
+			mpFormation = new Formation(*this);
+		}
 		return *mpFormation;
 	}
-
 
 private:
 	/**
 	 * Interface template for getting certain type of decision data.
 	 */
 	template <class DecisionDataDerived>
-	DecisionDataDerived & GetDecisionData(DecisionDataDerived ** xptr)
+	DecisionDataDerived &GetDecisionData(DecisionDataDerived **xptr)
 	{
-		if (*xptr == 0) {
+		if (*xptr == 0)
+		{
 			*xptr = new DecisionDataDerived(*this);
 		}
 		(*xptr)->Update();
@@ -219,14 +249,19 @@ public:
 	 * Each the following methods will check if an update should be performed first when it is called.
 	 * It's better to store the returned value in a variable when multiple uses are needed.
 	 */
-	Strategy & GetStrategy() { return GetDecisionData(& mpStrategy); }
-	Analyser & GetAnalyser() { return GetDecisionData(& mpAnalyser); }
+	Strategy &GetStrategy() { return GetDecisionData(&mpStrategy); }
+	Analyser &GetAnalyser() { return GetDecisionData(&mpAnalyser); }
 
 public:
-    /**
+	/**
      * Check commands sent to server, based on ActionEffector::CheckCommands. Will update IsNewSight and BallSeenTime.
      */
-	void CheckCommands(Observer *observer) { mIsNewSight = observer->IsNewSight();mBallSeenTime = observer->Ball().GetDist().time(); GetActionEffector().CheckCommands(observer); }
+	void CheckCommands(Observer *observer)
+	{
+		mIsNewSight = observer->IsNewSight();
+		mBallSeenTime = observer->Ball().GetDist().time();
+		GetActionEffector().CheckCommands(observer);
+	}
 
 	/**
 	 * Interface to ActionEffector::SendCommands.
@@ -252,78 +287,79 @@ public:
 private:
 	const Unum mSelfUnum; //Agent的号码总是为正
 	const bool mReverse;  //标记这个Agent是否反算对手
-	WorldModel * const mpWorldModel;
-	WorldState * const mpWorldState;
+	WorldModel *const mpWorldModel;
+	WorldState *const mpWorldState;
 
 	/** 以上变量在 Agent 的生存周期内是不会变的，各种形式的反算（包括反算队友和对手）都要 new 一个 Agent */
 
-	InfoState  * mpInfoState;
+	InfoState *mpInfoState;
 
 	bool mIsNewSight;
 	Time mBallSeenTime;
 
 	/** 以下变量在第一次使用时生成指向实例，在每次调用时检查是否需要更新 */
-	Strategy * mpStrategy;
-	Analyser * mpAnalyser;
+	Strategy *mpStrategy;
+	Analyser *mpAnalyser;
 
-    ActionEffector * mpActionEffector;
-    Formation * mpFormation;
+	ActionEffector *mpActionEffector;
+	Formation *mpFormation;
 
-    /**
+	/**
      * 关于last behavior的接口
      * 注意: 设置的接口都是在外面调用的，behavior*里面不用管
      **/
 public:
-    /**
+	/**
      * 得到上周期保存的activebehavior，没有则为空
      * @param type
      * @return
      */
-    ActiveBehavior *GetLastActiveBehavior(BehaviorType type) const;
+	ActiveBehavior *GetLastActiveBehavior(BehaviorType type) const;
 
-    /**
+	/**
      * 得到上周期实际执行的activebehavior
      * @return
      */
-    ActiveBehavior *GetLastActiveBehaviorInAct() const { return mLastActiveBehavior[0]; }
+	ActiveBehavior *GetLastActiveBehaviorInAct() const { return mLastActiveBehavior[0]; }
 
-    /**
+	/**
      * 返回本周期执行的行为 -- 这个要在DecisionTree::Decision返回后才有意义
      * @return
      */
-    ActiveBehavior *GetActiveBehaviorInAct() const { return mActiveBehavior[0]; }
+	ActiveBehavior *GetActiveBehaviorInAct() const { return mActiveBehavior[0]; }
 
-    /**
+	/**
      * 返回上周期是否执行了type类型的activebehavior
      * @param type
      * @return
      */
-    bool IsLastActiveBehaviorInActOf(BehaviorType type) const {
-    	return GetLastActiveBehaviorInAct() && GetLastActiveBehaviorInAct()->GetType() == type;
-    }
+	bool IsLastActiveBehaviorInActOf(BehaviorType type) const
+	{
+		return GetLastActiveBehaviorInAct() && GetLastActiveBehaviorInAct()->GetType() == type;
+	}
 
-    void SetHistoryActiveBehaviors();
+	void SetHistoryActiveBehaviors();
 
 private:
-    /**
+	/**
      * 保存behavior*决策出的最优activebehavior -- plan结束时保存
      * @param type
      */
-    void SaveActiveBehavior(const ActiveBehavior & beh);
+	void SaveActiveBehavior(const ActiveBehavior &beh);
 
-    friend class DecisionTree;
+	friend class DecisionTree;
 
-    void SaveActiveBehaviorList(const std::list<ActiveBehavior> & behavior_list);
+	void SaveActiveBehaviorList(const std::list<ActiveBehavior> &behavior_list);
 
-    /**
+	/**
      * 设置本周期实际执行的activebehavior -- excute时设置
      * @param type
      */
-    void SetActiveBehaviorInAct(BehaviorType type);
+	void SetActiveBehaviorInAct(BehaviorType type);
 
 private:
-	Array<ActiveBehavior*, BT_Max, true> mActiveBehavior;
-	Array<ActiveBehavior*, BT_Max, true> mLastActiveBehavior;
+	Array<ActiveBehavior *, BT_Max, true> mActiveBehavior;
+	Array<ActiveBehavior *, BT_Max, true> mLastActiveBehavior;
 };
 
 #endif /* AGENT_H_ */

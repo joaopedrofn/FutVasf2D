@@ -241,6 +241,70 @@ ServerPlayModeMap::ServerPlayModeMap() {
 	Bind("time_up", SPM_TimeUp);
 	Bind("time_extended", SPM_TimeExtended);
 
+	//HFO SPM
+	Bind("IN_GAME-L1", SPM_PlayOn_1);
+	Bind("IN_GAME-L2", SPM_PlayOn_2);
+	Bind("IN_GAME-L3", SPM_PlayOn_3);
+	Bind("IN_GAME-L4", SPM_PlayOn_4);
+	Bind("IN_GAME-L5", SPM_PlayOn_5);
+	Bind("IN_GAME-L6", SPM_PlayOn_6);
+	Bind("IN_GAME-L7", SPM_PlayOn_7);
+	Bind("IN_GAME-L8", SPM_PlayOn_8);
+	Bind("IN_GAME-L9", SPM_PlayOn_9);
+	Bind("IN_GAME-L10", SPM_PlayOn_10);
+	Bind("IN_GAME-L11", SPM_PlayOn_11);
+	Bind("IN_GAME-R1", SPM_PlayOn_1);
+	Bind("IN_GAME-R2", SPM_PlayOn_2);
+	Bind("IN_GAME-R3", SPM_PlayOn_3);
+	Bind("IN_GAME-R4", SPM_PlayOn_4);
+	Bind("IN_GAME-R5", SPM_PlayOn_5);
+	Bind("IN_GAME-R6", SPM_PlayOn_6);
+	Bind("IN_GAME-R7", SPM_PlayOn_7);
+	Bind("IN_GAME-R8", SPM_PlayOn_8);
+	Bind("IN_GAME-R9", SPM_PlayOn_9);
+	Bind("IN_GAME-R10", SPM_PlayOn_10);
+	Bind("IN_GAME-R11", SPM_PlayOn_11);
+	Bind("IN_GAME-U-1", SPM_PlayOn_1);
+	Bind("IN_GAME-U-2", SPM_PlayOn_2);
+	Bind("IN_GAME-U-3", SPM_PlayOn_3);
+	Bind("IN_GAME-U-4", SPM_PlayOn_4);
+	Bind("IN_GAME-U-5", SPM_PlayOn_5);
+	Bind("IN_GAME-U-6", SPM_PlayOn_6);
+	Bind("IN_GAME-U-7", SPM_PlayOn_7);
+	Bind("IN_GAME-U-8", SPM_PlayOn_8);
+	Bind("IN_GAME-U-9", SPM_PlayOn_9);
+	Bind("IN_GAME-U-10", SPM_PlayOn_10);
+	Bind("IN_GAME-U-11", SPM_PlayOn_11);
+
+
+	Bind("OUT_OF_BOUNDS", SPM_OutOfBounds);
+
+	Bind("CAPTURED_BY_DEFENSE-1", SPM_Captured);
+	Bind("CAPTURED_BY_DEFENSE-2", SPM_Captured);
+	Bind("CAPTURED_BY_DEFENSE-3", SPM_Captured);
+	Bind("CAPTURED_BY_DEFENSE-4", SPM_Captured);
+	Bind("CAPTURED_BY_DEFENSE-5", SPM_Captured);
+	Bind("CAPTURED_BY_DEFENSE-6", SPM_Captured);
+	Bind("CAPTURED_BY_DEFENSE-7", SPM_Captured);
+	Bind("CAPTURED_BY_DEFENSE-8", SPM_Captured);
+	Bind("CAPTURED_BY_DEFENSE-9", SPM_Captured);
+	Bind("CAPTURED_BY_DEFENSE-10", SPM_Captured);
+	Bind("CAPTURED_BY_DEFENSE-11", SPM_Captured);
+
+	Bind("GOAL-1", SPM_Goal_Train);
+	Bind("GOAL-2", SPM_Goal_Train);
+	Bind("GOAL-3", SPM_Goal_Train);
+	Bind("GOAL-4", SPM_Goal_Train);
+	Bind("GOAL-5", SPM_Goal_Train);
+	Bind("GOAL-6", SPM_Goal_Train);
+	Bind("GOAL-7", SPM_Goal_Train);
+	Bind("GOAL-8", SPM_Goal_Train);
+	Bind("GOAL-9", SPM_Goal_Train);
+	Bind("GOAL-10", SPM_Goal_Train);
+	Bind("GOAL-11", SPM_Goal_Train);
+
+	Bind("OUT_OF_TIME", SPM_TimeOut);
+
 	Assert(mString2Enum.size() == SPM_MAX - 1);
 }
 

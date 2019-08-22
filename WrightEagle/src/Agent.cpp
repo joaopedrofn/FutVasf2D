@@ -33,21 +33,23 @@
 #include <cstdlib>
 #include "Agent.h"
 #include "WorldModel.h"
+#include <fstream>
+#include <cstdio>
+#include <sys/stat.h>
 
 /**
  * Constructor.
  */
-Agent::Agent(Unum unum, WorldModel *world_model, bool reverse):
-	mSelfUnum( abs(unum) ),
-	mReverse( reverse ),
-	mpWorldModel( world_model ),
-	mpWorldState( &(world_model->World(reverse)) ),
-	mpInfoState( new InfoState( mpWorldState)),
-	mIsNewSight (false),
-	mpStrategy(0),
-	mpAnalyser(0),
-    mpActionEffector(0),
-    mpFormation(0)
+Agent::Agent(Unum unum, WorldModel *world_model, bool reverse) : mSelfUnum(abs(unum)),
+																 mReverse(reverse),
+																 mpWorldModel(world_model),
+																 mpWorldState(&(world_model->World(reverse))),
+																 mpInfoState(new InfoState(mpWorldState)),
+																 mIsNewSight(false),
+																 mpStrategy(0),
+																 mpAnalyser(0),
+																 mpActionEffector(0),
+																 mpFormation(0)
 {
 }
 
@@ -58,12 +60,13 @@ Agent::~Agent()
 {
 	SetHistoryActiveBehaviors();
 
-	for (int type = BT_None + 1; type < BT_Max; ++type) {
+	for (int type = BT_None + 1; type < BT_Max; ++type)
+	{
 		delete mLastActiveBehavior[type];
 	}
 
 	delete mpInfoState;
-    delete mpFormation;
+	delete mpFormation;
 	delete mpActionEffector;
 	delete mpStrategy;
 	delete mpAnalyser;
@@ -75,10 +78,10 @@ Agent::~Agent()
  * \return an agent created by "new" operator, which should be manually deleted when there will be no
  *         use any more.
  */
-Agent * Agent::CreateTeammateAgent(Unum unum) ///反算队友
+Agent *Agent::CreateTeammateAgent(Unum unum) ///反算队友
 {
-    Assert(unum != 0);
-    return new Agent(unum, mpWorldModel, mReverse); //reverse属性不变
+	Assert(unum != 0);
+	return new Agent(unum, mpWorldModel, mReverse); //reverse属性不变
 }
 
 /**
@@ -87,25 +90,27 @@ Agent * Agent::CreateTeammateAgent(Unum unum) ///反算队友
  * \return an agent created by "new" operator, which should be manually deleted when there will be no
  *         use any more.
  */
-Agent * Agent::CreateOpponentAgent(Unum unum) ///反算对手
+Agent *Agent::CreateOpponentAgent(Unum unum) ///反算对手
 {
 	return new Agent(unum, mpWorldModel, !mReverse); //reverse属性相反
 }
 
-
-void Agent::SaveActiveBehavior(const ActiveBehavior & beh)
+void Agent::SaveActiveBehavior(const ActiveBehavior &beh)
 {
 	BehaviorType type = beh.GetType();
 
 	Assert(type > BT_None && type < BT_Max);
 
-	if (mActiveBehavior[type] != 0) {
-		if (*mActiveBehavior[type] < beh) {
+	if (mActiveBehavior[type] != 0)
+	{
+		if (*mActiveBehavior[type] < beh)
+		{
 			delete mActiveBehavior[type];
 			mActiveBehavior[type] = new ActiveBehavior(beh);
 		}
 	}
-	else {
+	else
+	{
 		mActiveBehavior[type] = new ActiveBehavior(beh);
 	}
 }
@@ -125,23 +130,42 @@ void Agent::SetActiveBehaviorInAct(BehaviorType type)
 	mActiveBehavior[0] = mActiveBehavior[type];
 }
 
-void Agent::SaveActiveBehaviorList(const std::list<ActiveBehavior> & behavior_list)
+void Agent::SaveActiveBehaviorList(const std::list<ActiveBehavior> &behavior_list)
 {
-	for (std::list<ActiveBehavior>::const_iterator it = behavior_list.begin(); it != behavior_list.end(); ++it) {
+	for (std::list<ActiveBehavior>::const_iterator it = behavior_list.begin(); it != behavior_list.end(); ++it)
+	{
 		SaveActiveBehavior(*it);
 	}
 }
 
 void Agent::SetHistoryActiveBehaviors()
 {
-    for (int type = BT_None + 1; type < BT_Max; ++type) {
-        delete mLastActiveBehavior[type];
+	for (int type = BT_None + 1; type < BT_Max; ++type)
+	{
+		delete mLastActiveBehavior[type];
 
-        mLastActiveBehavior[type] = mActiveBehavior[type];
-        mActiveBehavior[type] = 0;
-    }
+		mLastActiveBehavior[type] = mActiveBehavior[type];
+		mActiveBehavior[type] = 0;
+	}
 
-    mLastActiveBehavior[0] = mActiveBehavior[0];
-    mActiveBehavior[0] = 0;
+	mLastActiveBehavior[0] = mActiveBehavior[0];
+	mActiveBehavior[0] = 0;
 }
 
+void Agent::lockQTable()
+{
+	std::ofstream creating("qTable.lock");
+	creating << std::endl;
+	creating.close();
+}
+
+void Agent::unlockQTable()
+{
+	remove("qTable.lock");
+}
+
+int Agent::isQTableLocked()
+{
+	struct stat buffer;
+	return (stat("qTable.lock", &buffer)) == 0;
+}

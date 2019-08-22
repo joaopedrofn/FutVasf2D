@@ -164,6 +164,23 @@ enum ServerPlayMode
 	SPM_TimeUp,
 	SPM_TimeExtended,
 
+	//HFO
+	SPM_OutOfBounds,
+	SPM_Captured,
+	SPM_PlayOn_1,
+	SPM_PlayOn_2,
+	SPM_PlayOn_3,
+	SPM_PlayOn_4,
+	SPM_PlayOn_5,
+	SPM_PlayOn_6,
+	SPM_PlayOn_7,
+	SPM_PlayOn_8,
+	SPM_PlayOn_9,
+	SPM_PlayOn_10,
+	SPM_PlayOn_11,
+	SPM_TimeOut,
+	SPM_Goal_Train,
+
 	SPM_MAX
 };
 
@@ -237,6 +254,21 @@ enum PlayMode
 	PM_Opp_Penalty_Miss,
     PM_Opp_Penalty_Foul,
     PM_Opp_Penalty_Winner,
+
+	//HFO
+	PM_OutOfBounds,
+	PM_Captured,
+	PM_Play_On_1,
+	PM_Play_On_2,
+	PM_Play_On_3,
+	PM_Play_On_4,
+	PM_Play_On_5,
+	PM_Play_On_6,
+	PM_Play_On_7,
+	PM_Play_On_8,
+	PM_Play_On_9,
+	PM_Play_On_10,
+	PM_Play_On_11,
 };
 
 enum CardType
