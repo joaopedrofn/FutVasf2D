@@ -151,7 +151,7 @@ void BehaviorShootPlanner::Plan(list<ActiveBehavior> & behavior_list)
 				shoot.mTarget = target;
 		double power = Kicker::instance().GetOneKickPower(mWorldState.GetBall().GetVel(), shoot.mTarget, mSelfState.GetKickRate());	string args;
 		double direction = (atan2 (shoot.mTarget.Y(),shoot.mTarget.X()) * 180 / 3.14159265) - mSelfState.GetBodyDir();
-		args = "./RF.exe ";
+		args = "./RF.bin ";
 		args += to_string(mWorldState.GetBall().GetPos().X()) + ' ' + to_string(mWorldState.GetBall().GetPos().Y());
 		args += ' ' + to_string(mWorldState.GetBall().GetVel().X());
 		args += ' '+to_string(power)+' '+to_string(mSelfState.GetPos().Y());
