@@ -101,10 +101,11 @@ void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> &behavior_list)
 	bool west = ballPosition.X() < position.X();
 
 	int curState = GetState(distToBall, teammateDistToBall, amITheClosest, oppDistToGoal, density, north, west);
+	
 	mAgent.lastStateOccurred = curState;
 
-	vector<double> actionSpace{qTable[curState][0], qTable[curState][1], qTable[curState][2], qTable[curState][3], qTable[curState][4], qTable[curState][5], qTable[curState][6], qTable[curState][7], qTable[curState][8]};
-	int actionToTake = greedyEpSelection(actionSpace, (1 - (qTable[curState][9] / 100000)));
+	std::vector<double> actionSpace{qTable[curState][0], qTable[curState][1], qTable[curState][2], qTable[curState][3], qTable[curState][4], qTable[curState][5], qTable[curState][6], qTable[curState][7], qTable[curState][8]};
+	int actionToTake = greedyEpSelection(actionSpace, (1 - (qTable[curState][9] / 100000))); //valor diferente.
 
 	//Uncomment to Trainning
 

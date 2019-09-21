@@ -3,17 +3,17 @@
 
 #include <vector>
 #include <iostream>
-#include "worldModel.h"
+#include "WorldModel.h"
 
-#include "qLearning.h"
 //current, max from next, reward
 static double learn(int u, int v, int r)
 {
-    return (u + alpha * (r + (qGamma * v) - u));
+    return (u + alpha * (r + (qGamma * v) - u)); //qual o valor de alpha e qGamma?
+
     // return ((1-alpha) * u + (alpha * (r + qGamma * v)));
 }
 
-static int greedySelection(vector<double> actions)
+static int greedySelection(std::vector<double> actions)
 {
 
     double biggest = -1000000000.0;
@@ -43,68 +43,19 @@ static int greedySelection(vector<double> actions)
     return bestAction;
 }
 
-static int greedyEpSelection(vector<double> actions, double epsilon)
+static int greedyEpSelection(std::vector<double> actions, double epsilon)
 {
 
     double x = drand48();
     if (x < epsilon)
     {
-        int v = int(rand() % 4);
+        int v = int(rand() % 9);
         return v;
     }
     else
     {
         return greedySelection(actions);
     }
-}
-
-static int future(int currentState, int action)
-{
-
-    int FutureState;
-
-    switch (action)
-    {
-
-    case 0:
-
-        FutureState = currentState - 4;
-        break;
-    case 1:
-
-        FutureState = currentState + 4;
-        break;
-    case 2:
-
-        if (currentState == 3 || currentState == 7 || currentState == 11 || currentState == 15)
-        {
-            FutureState = -1;
-        }
-        else
-        {
-
-            FutureState = currentState + 1;
-        }
-        break;
-    case 3:
-
-        if (currentState == 0 || currentState == 4 || currentState == 8 || currentState == 12)
-        {
-            FutureState = -1;
-        }
-        else
-        {
-
-            FutureState = currentState - 1;
-        }
-        break;
-    default:
-        cout << "DEU RUIM NO FUTURE" << endl;
-        exit(1);
-        break;
-    }
-
-    return FutureState;
 }
 
 #endif
