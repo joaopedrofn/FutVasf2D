@@ -10,7 +10,8 @@ src/Player.d: ../src/Player.cpp ../src/Player.h ../src/Client.h \
  ../src/WorldState.h ../src/CommunicateSystem.h ../src/InfoState.h \
  ../src/PositionInfo.h ../src/Strategy.h ../src/InterceptInfo.h \
  ../src/InterceptModel.h ../src/DecisionData.h ../src/Analyser.h \
- ../src/VisualSystem.h ../src/Logger.h ../src/TimeTest.h ../src/Dasher.h
+ ../src/VisualSystem.h ../src/Logger.h ../src/TimeTest.h ../src/Dasher.h \
+ ../src/qLearning.h ../src/worldModel.h ../src/PossibleActions.h
 
 ../src/Player.h:
 
@@ -89,3 +90,9 @@ src/Player.d: ../src/Player.cpp ../src/Player.h ../src/Client.h \
 ../src/TimeTest.h:
 
 ../src/Dasher.h:
+
+../src/qLearning.h:
+
+../src/worldModel.h:
+
+../src/PossibleActions.h:

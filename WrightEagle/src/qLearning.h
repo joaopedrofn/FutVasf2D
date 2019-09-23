@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <iostream>
-#include "WorldModel.h"
+#include "worldModel.h"
 
 //current, max from next, reward
 static double learn(int u, int v, int r)

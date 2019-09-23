@@ -11,7 +11,7 @@ src/BehaviorDefense.d: ../src/BehaviorDefense.cpp \
  ../src/BehaviorFormation.h ../src/BehaviorBlock.h ../src/BehaviorMark.h \
  ../src/Agent.h ../src/PositionInfo.h ../src/Strategy.h ../src/Dasher.h \
  ../src/Logger.h ../src/BehaviorIntercept.h ../src/VisualSystem.h \
- ../src/qLearning.h ../src/WorldModel.h ../src/PossibleActions.h \
+ ../src/qLearning.h ../src/worldModel.h ../src/PossibleActions.h \
  ../src/PossibleStates.h
 
 ../src/BehaviorDefense.h:
@@ -88,7 +88,7 @@ src/BehaviorDefense.d: ../src/BehaviorDefense.cpp \
 
 ../src/qLearning.h:
 
-../src/WorldModel.h:
+../src/worldModel.h:
 
 ../src/PossibleActions.h:
 
