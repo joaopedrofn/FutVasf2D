@@ -149,8 +149,10 @@ void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> &behavior_list)
 
 	// Uncomment to Trainning
 
-	// mAgent.lastActions.push_back(actionToTake);
-	// mAgent.lastActionsState.push_back(curState);
+	/*
+	
+	mAgent.lastActions.push_back(actionToTake);
+	mAgent.lastActionsState.push_back(curState);
 	PlayMode pm = mWorldState.GetPlayMode();
 	ServerPlayMode spm = SPM_Null;
 	switch (pm)
@@ -201,10 +203,11 @@ void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> &behavior_list)
 		break;
 	}
 
-	// Uncomment to trainning
+	mAgent.lastActionsPM.push_back(spm);
+	mAgent.cycleCounter++;
 
-	// mAgent.lastActionsPM.push_back(spm);
-	// mAgent.cycleCounter++;
+	*/
+
 	if (!mActiveBehaviorList.empty())
 	{
 		mActiveBehaviorList.sort(std::greater<ActiveBehavior>());
