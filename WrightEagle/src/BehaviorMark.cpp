@@ -46,6 +46,8 @@ const BehaviorType BehaviorMarkExecuter::BEHAVIOR_TYPE = BT_Mark;
 namespace
 {
 bool ret = BehaviorExecutable::AutoRegister<BehaviorMarkExecuter>();
+
+
 }
 
 BehaviorMarkExecuter::BehaviorMarkExecuter(Agent & agent) :

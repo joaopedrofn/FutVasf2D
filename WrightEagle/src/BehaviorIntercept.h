@@ -39,6 +39,7 @@
 class BehaviorInterceptExecuter : public BehaviorExecuterBase<BehaviorAttackData> {
 public:
 	BehaviorInterceptExecuter(Agent & agent);
+	
 	virtual ~BehaviorInterceptExecuter();
 
 	bool Execute(const ActiveBehavior &);
