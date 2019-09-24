@@ -168,16 +168,21 @@ void Player::Run()
 			
 			qTable[curState][9]++;
 			
+			ionInfo  mPositionInfo = mpAgent->Info().GetPositionInfo();
+			Unum closest_tm  = mPositionInfo.GetClosestTeammateToBall();
+
 			switch (mpObserver->GetServerPlayMode())
 			{
 			case SPM_Captured:
-				mpAgent->cycleCounter = 0;
-				mpAgent->lastActions.clear();
-				mpAgent->lastActionsState.clear();
-				mpAgent->lastActionsPM.clear();
-				// std::cout << "CAPTURED BY DEFENSE\n";
-				reward = 20;
-				qTable[thatState][thatAction] = learn(qTable[thatState][thatAction], maxFromCurrent, reward);
+				if(mpAgent->GetSelfUnum() == closest_tm){
+					mpAgent->cycleCounter = 0;
+					mpAgent->lastActions.clear();
+					mpAgent->lastActionsState.clear();
+					mpAgent->lastActionsPM.clear();
+					std::cout << "Capture -> " << closest_tm << std::endl;
+					reward = 20;
+					qTable[thatState][thatAction] = learn(qTable[thatState][thatAction], maxFromCurrent, reward);
+				}
 				break;
 			case SPM_OutOfBounds:
 				mpAgent->cycleCounter = 0;
