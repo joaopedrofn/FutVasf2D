@@ -112,23 +112,25 @@ void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> &behavior_list)
 	//mAgent.lastActionTaken = actionToTake;
 
 	double power = mSelfState.CorrectDashPowerForStamina(ServerParam::instance().maxDashPower());
+	int step = 10;
+
 	switch (actionToTake)
 	{
 	case MoveNorth:
-		if (mSelfState.GetPos().Y() + 2 <= 25)
-			Dasher::instance().GoToPoint(mAgent, Vector(mSelfState.GetPos().X(), mSelfState.GetPos().Y() + 10), 1.0, power, false, true);
+		if (mSelfState.GetPos().Y() + 2 <= 34)
+			Dasher::instance().GoToPoint(mAgent, Vector(mSelfState.GetPos().X(), mSelfState.GetPos().Y() + step), 1.0, power, false, true);
 		break;
 	case MoveSouth:
-		if (mSelfState.GetPos().Y() - 2 >= -25)
-			Dasher::instance().GoToPoint(mAgent, Vector(mSelfState.GetPos().X(), mSelfState.GetPos().Y() - 10), 1.0, power, false, true);
+		if (mSelfState.GetPos().Y() - 2 >= -34)
+			Dasher::instance().GoToPoint(mAgent, Vector(mSelfState.GetPos().X(), mSelfState.GetPos().Y() - step), 1.0, power, false, true);
 		break;
 	case MoveWest:
-		if (mSelfState.GetPos().X() - 2 >= -51)
-			Dasher::instance().GoToPoint(mAgent, Vector(mSelfState.GetPos().X() - 10, mSelfState.GetPos().Y()), 1.0, power, false, true);
+		if (mSelfState.GetPos().X() - 2 >= -52.5)
+			Dasher::instance().GoToPoint(mAgent, Vector(mSelfState.GetPos().X() - step, mSelfState.GetPos().Y()), 1.0, power, false, true);
 		break;
 	case MoveEast:
-		if (mSelfState.GetPos().X() + 2 >= 51)
-			Dasher::instance().GoToPoint(mAgent, Vector(mSelfState.GetPos().X() + 10, mSelfState.GetPos().Y()), 1.0, power, false, true);
+		if (mSelfState.GetPos().X() + 2 <= 52.5)
+			Dasher::instance().GoToPoint(mAgent, Vector(mSelfState.GetPos().X() + step, mSelfState.GetPos().Y()), 1.0, power, false, true);
 		break;
 	case MoveToBall:
 		Dasher::instance().GoToPoint(mAgent, ballPosition, 1.0, power, false, true);
