@@ -8,8 +8,8 @@
 //current, max from next, reward
 static double learn(int u, int v, int r)
 {
-    return (u + alpha * (r + (qGamma * v) - u)); //qual o valor de alpha e qGamma?
-
+    //std::cout << "learn" << std::endl;
+    return (u + alpha * (r + (qGamma * v) - u));
     // return ((1-alpha) * u + (alpha * (r + qGamma * v)));
 }
 
@@ -50,6 +50,7 @@ static int greedyEpSelection(std::vector<double> actions, double epsilon)
     if (x < epsilon)
     {
         int v = int(rand() % 9);
+        //std::cout << v << std::endl;
         return v;
     }
     else

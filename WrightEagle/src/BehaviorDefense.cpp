@@ -104,11 +104,11 @@ void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> &behavior_list)
 	
 	mAgent.lastStateOccurred = curState;
 
+
 	std::vector<double> actionSpace{qTable[curState][0], qTable[curState][1], qTable[curState][2], qTable[curState][3], qTable[curState][4], qTable[curState][5], qTable[curState][6], qTable[curState][7], qTable[curState][8]};
 	int actionToTake = greedyEpSelection(actionSpace, (1 - (qTable[curState][9] / 100000))); //valor diferente.
 
 	//Uncomment to Trainning
-
 	//mAgent.lastActionTaken = actionToTake;
 
 	double power = mSelfState.CorrectDashPowerForStamina(ServerParam::instance().maxDashPower());
@@ -145,9 +145,12 @@ void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> &behavior_list)
 		BehaviorMarkPlanner(mAgent).Plan(behavior_list);
 		break;
 	case StayStill:
+	
 	default:
 		break;
 	}
+
+	
 
 	// Uncomment to Trainning
 

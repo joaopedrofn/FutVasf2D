@@ -260,4 +260,7 @@ void Player::Run()
 		}
 	*/
 	//END OF QTable AREA
+
+	
+		
 }
