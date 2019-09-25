@@ -180,6 +180,8 @@ enum ServerPlayMode
 	SPM_PlayOn_11,
 	SPM_TimeOut,
 	SPM_Goal_Train,
+	
+	SPM_HFO_FINISHED,
 
 	SPM_MAX
 };

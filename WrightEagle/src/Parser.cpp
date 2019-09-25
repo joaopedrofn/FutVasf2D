@@ -1618,6 +1618,7 @@ void Parser::ParsePlayMode(char *msg)
 		pm = ( mpObserver->OurInitSide() == 'l' ) ? PM_Our_Back_Pass_Kick : PM_Opp_Back_Pass_Kick;
 		break;
 	case SPM_TimeOver:
+	case SPM_HFO_FINISHED:
 		pm = PM_Time_Over;
 		break;
 	case SPM_TimeUp:

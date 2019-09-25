@@ -304,6 +304,7 @@ ServerPlayModeMap::ServerPlayModeMap() {
 	Bind("GOAL-11", SPM_Goal_Train);
 
 	Bind("OUT_OF_TIME", SPM_TimeOut);
+	Bind("HFO_FINISHED", SPM_HFO_FINISHED);
 
 	Assert(mString2Enum.size() == SPM_MAX - 1);
 }
