@@ -652,7 +652,6 @@ enum PossibleStates {
 
 
 /*
-
     Range of values:
 
     DISTANCE    CLOSESTDISTANCE AMITHECLOSEST   OPPDIST    DENSITY
@@ -661,8 +660,6 @@ enum PossibleStates {
     CLOSE: < 10      CLOSE: < 5                  CLOSE: < 11     SPARSE: >= 14
     MEDIUM: < 20    MEDIUM: < 10                 MEDIUM: < 22    DENSE:  < 14
     FAR: >= 30      FAR: >= 15                   FAR: >= 22      TOO_DENSE: < 7
-
-
 
 */
 

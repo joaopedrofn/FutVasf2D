@@ -42,7 +42,7 @@ PositionInfo::PositionInfo(WorldState *pWorldState, InfoState *pInfoState):
 	InfoStateBase(pWorldState, pInfoState),
 	mPlayerWithBallList_UpdateTime(Time(-3, 0))
 {
-	lastWasOpp = false;
+	mlastWasOpp = false;
 }
 
 void PositionInfo::UpdateRoutine()
@@ -67,11 +67,17 @@ void PositionInfo::UpdateRoutine()
 }
 
 bool PositionInfo::GetLastWasOpp(){
-	return lastWasOpp;
+	return this->mlastWasOpp;
 }
 
-void PositionInfo::SetLastWasOpp(bool wasOpp){
-	lastWasOpp = wasOpp;
+void PositionInfo::SetLastWasOpp(){
+	if(GetOpponentWithBall() > 0){
+		mlastWasOpp = true;
+	}else{
+		if(GetTeammateWithBall() > 0){
+			mlastWasOpp = false;
+		}
+	}
 }
 
 void PositionInfo::UpdateDistMatrix()

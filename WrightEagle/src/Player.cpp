@@ -134,10 +134,10 @@ void Player::Run()
 	//QTable AREA
 	/*==============================================//
 	*
-	*	Uncomment to trainning
+	*	Uncomment to training
 	*
 	==================================================*/
-	///*
+	
 		if (++mpAgent->generalCycleCounter >= 3000)
 		{
 			mpAgent->generalCycleCounter = 0;
@@ -155,30 +155,39 @@ void Player::Run()
 
 		int curState = mpAgent->lastStateOccurred;
 		ServerPlayMode curSPM = mpObserver->GetServerPlayMode();
-		
+	
+		PlayMode pm = mpAgent->World().GetPlayMode();
+
+//		(curSPM ==  pm ? cout << "SIM" << endl : cout << "NÃO" << endl); 
+
 		int actionToTake = mpAgent->lastActionTaken;
-		if (curState != -1 && (curSPM == SPM_Captured || curSPM == SPM_OutOfBounds || curSPM == SPM_Goal_Train || curSPM == SPM_PlayOn_1 || curSPM == SPM_PlayOn_2 || curSPM == SPM_PlayOn_3 || curSPM == SPM_PlayOn_4 || curSPM == SPM_PlayOn_5 || curSPM == SPM_PlayOn_6 || curSPM == SPM_PlayOn_7 || curSPM == SPM_PlayOn_8 || curSPM == SPM_PlayOn_9 || curSPM == SPM_PlayOn_10 || curSPM == SPM_PlayOn_11))
-		{
+	//	if (curState != -1 && (curSPM == SPM_Captured || curSPM == SPM_OutOfBounds || curSPM == SPM_Goal_Train || curSPM == SPM_PlayOn_1 || curSPM == SPM_PlayOn_2 || curSPM == SPM_PlayOn_3 || curSPM == SPM_PlayOn_4 || curSPM == SPM_PlayOn_5 || curSPM == SPM_PlayOn_6 || curSPM == SPM_PlayOn_7 || curSPM == SPM_PlayOn_8 || curSPM == SPM_PlayOn_9 || curSPM == SPM_PlayOn_10 || curSPM == SPM_PlayOn_11))
+	//	{
 			double reward = 0;
 			int thatState = mpAgent->lastActionsState.size() ? mpAgent->lastActionsState[0] : -1;
 			int thatAction = mpAgent->lastActions.size() ? mpAgent->lastActions[0] : -1;
-			ServerPlayMode thatPM = mpAgent->lastActionsPM.size() ? mpAgent->lastActionsPM[0] : SPM_Null;
+		//	ServerPlayMode thatPM = mpAgent->lastActionsPM.size() ? mpAgent->lastActionsPM[0] : SPM_Null;
 			std::vector<double> actionSpace{qTable[curState][0], qTable[curState][1], qTable[curState][2], qTable[curState][3], qTable[curState][4], qTable[curState][5], qTable[curState][6], qTable[curState][7], qTable[curState][8]};
 			int maxFromCurrent = greedySelection(actionSpace);
 			
 			qTable[curState][9]++;
+			PositionInfo  *mPositionInfo = &(mpAgent->Info().GetPositionInfo());
 			
-			PositionInfo  mPositionInfo = mpAgent->Info().GetPositionInfo();
-			Unum closest_tm  = mPositionInfo.GetClosestTeammateToBall();
+			Unum closest_tm  = mPositionInfo->GetClosestTeammateToBall();
+//			std::cout << closest_tm << endl; 
+			Unum tmmwball = mPositionInfo->GetTeammateWithBall();
+			double distToBall = mPositionInfo->GetBallDistToTeammate(mpAgent->GetSelfUnum());	
+		
+			Unum oppwball = mPositionInfo->GetBallDistToTeammate(mpAgent->GetSelfUnum());
 
-			if(mPositionInfo.GetTeammateWithBall() == mpAgent->GetSelfUnum() && mPositionInfo.GetLastWasOpp() == true){
-				mPositionInfo.SetLastWasOpp(false);
-				std::cout << "reward ->" << mpAgent->GetSelfUnum() << std::endl;
-			}
+		//	cout << "EIEIEIEIEIIEIEIEIEIIEIEIEIEIIE" << endl;
 
-			switch (mpObserver->GetServerPlayMode())
+			//cout << "\nESTE É O PM: " << pm << "\n";
+
+		/*	switch (mpObserver->GetServerPlayMode())
 			{
 			case SPM_Captured:
+				{
 				if(mpAgent->GetSelfUnum() == closest_tm){
 					mpAgent->cycleCounter = 0;
 					mpAgent->lastActions.clear();
@@ -189,7 +198,9 @@ void Player::Run()
 					qTable[thatState][thatAction] = learn(qTable[thatState][thatAction], maxFromCurrent, reward);
 				}
 				break;
+				}
 			case SPM_OutOfBounds:
+				{
 				mpAgent->cycleCounter = 0;
 				mpAgent->lastActions.clear();
 				mpAgent->lastActionsState.clear();
@@ -199,7 +210,9 @@ void Player::Run()
 				reward = 10;
 				qTable[thatState][thatAction] = learn(qTable[thatState][thatAction], maxFromCurrent, reward);
 				break;
+				}
 			case SPM_Goal_Train:
+				{
 				mpAgent->goalCounter++;
 				mpAgent->cycleCounter = 0;
 				mpAgent->lastActions.clear();
@@ -209,19 +222,154 @@ void Player::Run()
 				reward = -20;
 				qTable[thatState][thatAction] = learn(qTable[thatState][thatAction], maxFromCurrent, reward);
 				break;
+				}
 			case SPM_TimeOut:
+				{
 				mpAgent->cycleCounter = 0;
 				mpAgent->lastActions.clear();
 				mpAgent->lastActionsState.clear();
 				mpAgent->lastActionsPM.clear();
 				break;
+				}
 			default:
 				break;
-			}
+			}*/
+				
 			char side = mpObserver->OurInitSide();
+
+			int sideb, ballSide;
+			
+			double ballX = mpAgent->GetStrategy().GetBallInterPos().X();
+
+			if(ballX != 0)
+				ballSide = ballX/abs(ballX);
+			else
+				ballSide = -1;
+			
+			if(side == 'l')
+				sideb = -1;
+			else
+				sideb = 1;
+
 			Vector goal(side == 'l' ? 51.162 : -51.162, 0);
+		
+			switch (pm)
+			{
+				case PM_Play_On:
+				{ 
+					if((mPositionInfo->GetTeammateWithBall() == mpAgent->GetSelfUnum()) && (mPositionInfo->GetLastWasOpp() == true)){
+						mPositionInfo->SetLastWasOpp();
+						//std::cout << "reward ->" << mpAgent->GetSelfUnum() << std::endl;
+						mpAgent->cycleCounter = 0;
+						mpAgent->lastActions.clear();
+						mpAgent->lastActionsState.clear();
+						mpAgent->lastActionsPM.clear();
+						reward = 20;
+						qTable[thatState][thatAction] = learn(qTable[thatState][thatAction], maxFromCurrent, reward);
+					} else if ((tmmwball != 0) && (distToBall < 15) && (mpAgent->lastActionTaken == 7)){
+						mpAgent->cycleCounter = 0;
+						mpAgent->lastActions.clear();
+						mpAgent->lastActionsState.clear();
+						mpAgent->lastActionsPM.clear();
+						//cout << "Capture -> " << mpAgent->GetSelfUnum() << endl;
+						reward = 10;
+						qTable[thatState][thatAction] = learn(qTable[thatState][thatAction], maxFromCurrent, reward);
+					} else if ((oppwball != 0) && (distToBall > 15) && (mpAgent->GetFormation().GetMyRole().mLineType == LT_Defender) && (ballSide == sideb)){
+						//cout << "penalidade -> " << mpAgent->GetSelfUnum() << endl;  
+						mpAgent->cycleCounter = 0;
+						mpAgent->lastActions.clear();
+						mpAgent->lastActionsState.clear();
+						mpAgent->lastActionsPM.clear();
+						reward = -5;
+						qTable[thatState][thatAction] = learn(qTable[thatState][thatAction], maxFromCurrent, reward);
+						
+					} else {
+						mpAgent->cycleCounter = 0;
+						mpAgent->lastActions.clear();
+						mpAgent->lastActionsState.clear();
+						mpAgent->lastActionsPM.clear();
+						reward = 0;
+						qTable[thatState][thatAction] = learn(qTable[thatState][thatAction], maxFromCurrent, reward);
+						} 
+					}
+					if (mpAgent->lastBallPosition.Dist(goal) > mpAgent->lastGoalDist)
+					{
+						if (mpAgent->lastBallPosition.Dist(mpAgent->lastPosition) < mpAgent->lastPlayerDist)
+							reward = 5;
+						else
+							reward = 2;
+
+						qTable[thatState][thatAction] = learn(qTable[thatState][thatAction], maxFromCurrent, reward);
+					}
+					break;
+				case PM_Opp_Kick_Off:
+				{
+					std::cout << "fora" << std::endl;
+					if (mpAgent->lastActionTaken == (6 || 7)){
+						mpAgent->cycleCounter = 0;
+						mpAgent->lastActions.clear();
+						mpAgent->lastActionsState.clear();
+						mpAgent->lastActionsPM.clear();
+						reward = 5;
+						qTable[thatState][thatAction] = learn(qTable[thatState][thatAction], maxFromCurrent, reward);
+					} else {
+						mpAgent->cycleCounter = 0;
+						mpAgent->lastActions.clear();
+						mpAgent->lastActionsState.clear();
+						mpAgent->lastActionsPM.clear();
+						reward = 0;
+						qTable[thatState][thatAction] = learn(qTable[thatState][thatAction], maxFromCurrent, reward);
+						}
+					}
+					break;
+				case PM_Our_Goal_Kick:
+				{	
+					std::cout << "oponente chutou pro gol" << std::endl;
+					if (distToBall < 15){
+						mpAgent->cycleCounter = 0;
+						mpAgent->lastActions.clear();
+						mpAgent->lastActionsState.clear();
+						mpAgent->lastActionsPM.clear();
+						reward = -5;
+						qTable[thatState][thatAction] = learn(qTable[thatState][thatAction], maxFromCurrent, reward);
+					} else {
+						mpAgent->cycleCounter = 0;
+						mpAgent->lastActions.clear();
+						mpAgent->lastActionsState.clear();
+						mpAgent->lastActionsPM.clear();
+						reward = -2;
+						qTable[thatState][thatAction] = learn(qTable[thatState][thatAction], maxFromCurrent, reward);
+					}
+					}
+					break;
+				case PM_Goal_Ours:
+				{
+						std::cout << "gol do oponente" << std::endl;
+						mpAgent->cycleCounter = 0;
+						mpAgent->lastActions.clear();
+						mpAgent->lastActionsState.clear();
+						mpAgent->lastActionsPM.clear();
+						reward = -20;
+						qTable[thatState][thatAction] = learn(qTable[thatState][thatAction], maxFromCurrent, reward);
+					}
+					break;
+				case PM_Half_Time:
+				{		
+						mpAgent->cycleCounter = 0;
+						mpAgent->lastActions.clear();
+						mpAgent->lastActionsState.clear();
+						mpAgent->lastActionsPM.clear();
+					}
+					break;
+				default:
+					break;
+				}
+
+			mPositionInfo->SetLastWasOpp();
+			
+
 			// std::cout << goal << std::endl;
-			if (mpAgent->cycleCounter == 1)
+		/*	if (mpAgent->cycleCounter == 1)
 			{
 				mpAgent->cycleCounter = 0;
 				mpAgent->lastActions.erase(mpAgent->lastActions.begin());
@@ -240,21 +388,11 @@ void Player::Run()
 				case SPM_PlayOn_3:
 				case SPM_PlayOn_2:
 				case SPM_PlayOn_1:
-					if (mpAgent->lastBallPosition.Dist(goal) > mpAgent->lastGoalDist)
-					{
-						if (mpAgent->lastBallPosition.Dist(mpAgent->lastPosition) < mpAgent->lastPlayerDist)
-							reward = 5;
-						else
-							reward = 2;
-
-						qTable[thatState][thatAction] = learn(qTable[thatState][thatAction], maxFromCurrent, reward);
-					}
-					break;
 				default:
 					break;
 				}
 
-			}
+			}*/
 
 			mpAgent->lastGoalDist = mpAgent->lastBallPosition.Dist(goal);
 			mpAgent->lastPlayerDist = mpAgent->lastBallPosition.Dist(mpAgent->lastPosition);
@@ -262,10 +400,7 @@ void Player::Run()
 			std::ofstream qTableFileOut(qTableString.str(), std::ios::binary);
 			qTableFileOut.write((char *)&qTable, sizeof(qTable));
 			qTableFileOut.close();
-		}
-	//*/
+	//	}
 	//END OF QTable AREA
 
-	
-		
 }

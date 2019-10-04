@@ -141,7 +141,7 @@ public:
      * return Unum of opponent.
      */
 	bool GetLastWasOpp();
-	void SetLastWasOpp(bool wasOpp);
+	void SetLastWasOpp();
 
     Unum GetOpponentWithBall(const double buffer);
 
@@ -180,7 +180,7 @@ private:
 	double mTeammateOffsideLine;
 	double mTeammateOffsideLineConf;
 	double mTeammateOffsideLineSpeed;
-	bool lastWasOpp;
+	bool mlastWasOpp;
 	Unum mOpponentOffsideLineTm;
 	double mOpponentOffsideLine;
 	double mOpponentOffsideLineConf;

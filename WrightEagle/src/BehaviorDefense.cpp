@@ -124,10 +124,9 @@ void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> &behavior_list)
 		actionToTake = greedyEpSelection(actionSpace, minepsilon);
 	}
 
-	if(mPositionInfo.GetOpponentWithBall() != 0){
-		mPositionInfo.SetLastWasOpp(true);
-	}
 	
+	mPositionInfo.SetLastWasOpp();
+
 	//Uncomment to Trainning
 	///*
 	mAgent.lastActionTaken = actionToTake; 
@@ -155,12 +154,26 @@ void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> &behavior_list)
 			Dasher::instance().GoToPoint(mAgent, Vector(mSelfState.GetPos().X() + step, mSelfState.GetPos().Y()), 1.0, power, false, true);
 		break;
 	case MoveToBall:
+		{
 	//	cout << "I tried to MOVETOBALL" << endl;
-		Dasher::instance().GoToPoint(mAgent, ballPosition, 1.0, power, false, true);
+		ActiveBehavior move(mAgent, BT_Formation);	
+		
+		move.mBuffer = 1.0;
+		move.mPower = power;
+		move.mTarget = ballPosition;		
+
+		Logger::instance().LogGoToPoint(move.mTarget, move.mTarget, "@Formation");
+		Dasher::instance().GoToPoint(mAgent, move.mTarget, 1.0, move.mPower, false, true);
+		}
 		break;
-	case InterceptAction:
+	case InterceptAction:{
 	//	cout << "I tried to INTERCEPT" << endl;
+		ActiveBehavior intercept(mAgent, BT_Intercept, BDT_Intercept_Normal);
+		intercept.mTarget = mStrategy.GetMyInterPos();  
+
+		Logger::instance().LogIntercept(intercept.mTarget, "@Intercept");
 		Dasher::instance().GetBall(mAgent);
+	}
 		break;
 	case BlockAction:
 		{
@@ -168,8 +181,9 @@ void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> &behavior_list)
 		ActiveBehavior block(mAgent, BT_Block);
 
 		block.mBuffer = 0.5;
-		block.mPower = mSelfState.CorrectDashPowerForStamina(ServerParam::instance().maxDashPower());
+		block.mPower = power;
 		block.mTarget = mAnalyser.mLightHouse;
+		Logger::instance().LogGoToPoint(mSelfState.GetPos(), block.mTarget, "@Block");
 		Dasher::instance().GoToPoint(mAgent, block.mTarget, block.mBuffer, block.mPower, true, false);
 	}
 		break;
@@ -181,8 +195,9 @@ void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> &behavior_list)
 		Vector ballPos = mBallState.GetPos();
 		AngleDeg b2o = (ballPos- mWorldState.GetOpponent(closest_opp).GetPos()).Dir();
 		mark.mBuffer = mSelfState.GetKickableArea();
-		mark.mPower = mSelfState.CorrectDashPowerForStamina(ServerParam::instance().maxDashPower());
+		mark.mPower = power;
 		mark.mTarget = mWorldState.GetOpponent(closest_opp).GetPos()  + Polar2Vector(mark.mBuffer , b2o);
+		Logger::instance().LogGoToPoint(mSelfState.GetPos(), mark.mTarget, "@Mark");
 		Dasher::instance().GoToPoint(mAgent, mark.mTarget, mark.mBuffer, mark.mPower, false, false);
 		}
 		break;
@@ -192,81 +207,79 @@ void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> &behavior_list)
 		break;
 	}
 
-	
-
 	// Uncomment to Trainning
 	///*
 	
 	mAgent.lastActions.push_back(actionToTake);
 	mAgent.lastActionsState.push_back(curState);
-	PlayMode pm = mWorldState.GetPlayMode();
-	ServerPlayMode spm = SPM_Null;
-	switch (pm)
-	{
-	case PM_Goal_Opps:
-		spm = SPM_Goal_Train;
-		break;
-	case PM_Captured:
-		spm = SPM_Captured;
-		break;
-	case PM_OutOfBounds:
-		spm = SPM_OutOfBounds;
-		break;
-	case PM_Play_On_11:
-		spm = SPM_PlayOn_11;
-		break;
-	case PM_Play_On_10:
-		spm = SPM_PlayOn_1;
-		break;
-	case PM_Play_On_9:
-		spm = SPM_PlayOn_9;
-		break;
-	case PM_Play_On_8:
-		spm = SPM_PlayOn_8;
-		break;
-	case PM_Play_On_7:
-		spm = SPM_PlayOn_7;
-		break;
-	case PM_Play_On_6:
-		spm = SPM_PlayOn_6;
-		break;
-	case PM_Play_On_5:
-		spm = SPM_PlayOn_5;
-		break;
-	case PM_Play_On_4:
-		spm = SPM_PlayOn_4;
-		break;
-	case PM_Play_On_3:
-		spm = SPM_PlayOn_3;
-		break;
-	case PM_Play_On_2:
-		spm = SPM_PlayOn_2;
-		break;
-	case PM_Play_On_1:
-		spm = SPM_PlayOn_1;
-		break;
-	default:
-		break;
-	}
+	//PlayMode pm = mWorldState.GetPlayMode();
+	//ServerPlayMode spm = SPM_Null;
+	// switch (pm)
+	// {
+	// case PM_Goal_Opps:
+	// 	spm = SPM_Goal_Train;
+	// 	break;
+	// case PM_Captured:
+	// 	spm = SPM_Captured;
+	// 	break;
+	// case PM_OutOfBounds:
+	// 	spm = SPM_OutOfBounds;
+	// 	break;
+	// case PM_Play_On_11:
+	// 	spm = SPM_PlayOn_11;
+	// 	break;
+	// case PM_Play_On_10:
+	// 	spm = SPM_PlayOn_1;
+	// 	break;
+	// case PM_Play_On_9:
+	// 	spm = SPM_PlayOn_9;
+	// 	break;
+	// case PM_Play_On_8:
+	// 	spm = SPM_PlayOn_8;
+	// 	break;
+	// case PM_Play_On_7:
+	// 	spm = SPM_PlayOn_7;
+	// 	break;
+	// case PM_Play_On_6:
+	// 	spm = SPM_PlayOn_6;
+	// 	break;
+	// case PM_Play_On_5:
+	// 	spm = SPM_PlayOn_5;
+	// 	break;
+	// case PM_Play_On_4:
+	// 	spm = SPM_PlayOn_4;
+	// 	break;
+	// case PM_Play_On_3:
+	// 	spm = SPM_PlayOn_3;
+	// 	break;
+	// case PM_Play_On_2:
+	// 	spm = SPM_PlayOn_2;
+	// 	break;
+	// case PM_Play_On_1:
+	// 	spm = SPM_PlayOn_1;
+	// 	break;
+	// default:
+	// 	break;
+	// }
 
-	mAgent.lastActionsPM.push_back(spm);
+	//mAgent.lastActionsPM.push_back(spm);
 	mAgent.cycleCounter++;
 	//*/
 
-	if (!mActiveBehaviorList.empty())
-	{
-		mActiveBehaviorList.sort(std::greater<ActiveBehavior>());
-		behavior_list.push_back(mActiveBehaviorList.front());
+	// if (!mActiveBehaviorList.empty())
+	// {
+	// 	mActiveBehaviorList.sort(std::greater<ActiveBehavior>());
+	// 	behavior_list.push_back(mActiveBehaviorList.front());
 
-		if (mActiveBehaviorList.size() > 1)
-		{ //允许非最优行为提交视觉请求
-			double plus = 1.0;
-			ActiveBehaviorPtr it = mActiveBehaviorList.begin();
-			for (++it; it != mActiveBehaviorList.end(); ++it)
-			{
-				it->SubmitVisualRequest(plus);
-				plus *= 2.0;
-			}
-		}
-	}
+	// 	if (mActiveBehaviorList.size() > 1)
+	// 	{ //允许非最优行为提交视觉请求
+	// 		double plus = 1.0;
+	// 		ActiveBehaviorPtr it = mActiveBehaviorList.begin();
+	// 		for (++it; it != mActiveBehaviorList.end(); ++it)
+	// 		{
+	// 			it->SubmitVisualRequest(plus);
+	// 			plus *= 2.0;
+	// 		}
+	// 	}
+	// }
 }
