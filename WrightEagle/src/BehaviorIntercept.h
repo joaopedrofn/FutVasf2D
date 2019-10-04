@@ -36,6 +36,7 @@
 #include "BehaviorBase.h"
 #include "VisualSystem.h"
 
+
 class BehaviorInterceptExecuter : public BehaviorExecuterBase<BehaviorAttackData> {
 public:
 	BehaviorInterceptExecuter(Agent & agent);

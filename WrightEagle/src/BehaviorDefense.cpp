@@ -100,16 +100,34 @@ void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> &behavior_list)
 	bool north = ballPosition.Y() > position.Y();
 	bool west = ballPosition.X() < position.X();
 
+	//INSERTED
+	Unum closest_opp = mPositionInfo.GetClosestOpponentToTeammate(mSelfState.GetUnum());
+
 	int curState = GetState(distToBall, teammateDistToBall, amITheClosest, oppDistToGoal, density, north, west);
 	
 	mAgent.lastStateOccurred = curState;
 
 
 	std::vector<double> actionSpace{qTable[curState][0], qTable[curState][1], qTable[curState][2], qTable[curState][3], qTable[curState][4], qTable[curState][5], qTable[curState][6], qTable[curState][7], qTable[curState][8]};
-	int actionToTake = greedyEpSelection(actionSpace, (1 - (qTable[curState][9] / 100000))); //valor diferente.
+	//int actionToTake = greedyEpSelection(actionSpace, (1 - (qTable[curState][9] / 100000))); //valor diferente.
+	int actionToTake;
 
+	double minepsilon = 0.5;
+	double newepsilon = 1 - ((double)qTable[curState][9]/(double)100);
+
+	if (newepsilon > minepsilon){
+		//cout << "EPSILON GRANDE" << endl;
+		actionToTake = greedyEpSelection(actionSpace, newepsilon);
+	}
+	else{
+		//cout << "EPSILON PEQUENO" << endl;
+		actionToTake = greedyEpSelection(actionSpace, minepsilon);
+	}
+	
 	//Uncomment to Trainning
-	//mAgent.lastActionTaken = actionToTake;
+	///*
+	mAgent.lastActionTaken = actionToTake; 
+	//*/
 
 	double power = mSelfState.CorrectDashPowerForStamina(ServerParam::instance().maxDashPower());
 	int step = 10;
@@ -133,16 +151,36 @@ void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> &behavior_list)
 			Dasher::instance().GoToPoint(mAgent, Vector(mSelfState.GetPos().X() + step, mSelfState.GetPos().Y()), 1.0, power, false, true);
 		break;
 	case MoveToBall:
+	//	cout << "I tried to MOVETOBALL" << endl;
 		Dasher::instance().GoToPoint(mAgent, ballPosition, 1.0, power, false, true);
 		break;
 	case InterceptAction:
-		BehaviorInterceptPlanner(mAgent).Plan(behavior_list);
+	//	cout << "I tried to INTERCEPT" << endl;
+		Dasher::instance().GetBall(mAgent);
 		break;
 	case BlockAction:
-		BehaviorBlockPlanner(mAgent).Plan(behavior_list);
+		{
+	//	cout << "I tried to BLOCK" << endl;
+		ActiveBehavior block(mAgent, BT_Block);
+
+		block.mBuffer = 0.5;
+		block.mPower = mSelfState.CorrectDashPowerForStamina(ServerParam::instance().maxDashPower());
+		block.mTarget = mAnalyser.mLightHouse;
+		Dasher::instance().GoToPoint(mAgent, block.mTarget, block.mBuffer, block.mPower, true, false);
+	}
 		break;
 	case MarkAction:
-		BehaviorMarkPlanner(mAgent).Plan(behavior_list);
+		{
+	//	cout << "I tried to MARK" << endl;
+		ActiveBehavior mark(mAgent, BT_Mark);
+
+		Vector ballPos = mBallState.GetPos();
+		AngleDeg b2o = (ballPos- mWorldState.GetOpponent(closest_opp).GetPos()).Dir();
+		mark.mBuffer = mSelfState.GetKickableArea();
+		mark.mPower = mSelfState.CorrectDashPowerForStamina(ServerParam::instance().maxDashPower());
+		mark.mTarget = mWorldState.GetOpponent(closest_opp).GetPos()  + Polar2Vector(mark.mBuffer , b2o);
+		Dasher::instance().GoToPoint(mAgent, mark.mTarget, mark.mBuffer, mark.mPower, false, false);
+		}
 		break;
 	case StayStill:
 	
@@ -153,8 +191,7 @@ void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> &behavior_list)
 	
 
 	// Uncomment to Trainning
-
-	/*
+	///*
 	
 	mAgent.lastActions.push_back(actionToTake);
 	mAgent.lastActionsState.push_back(curState);
@@ -210,8 +247,7 @@ void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> &behavior_list)
 
 	mAgent.lastActionsPM.push_back(spm);
 	mAgent.cycleCounter++;
-
-	*/
+	//*/
 
 	if (!mActiveBehaviorList.empty())
 	{

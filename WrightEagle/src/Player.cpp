@@ -48,7 +48,7 @@
 #include <fstream>
 #include "qLearning.h"
 #include "PossibleActions.h"
-// #include "PossibleStates.h"
+//#include "PossibleStates.h"
 #include <vector>
 
 Player::Player() : mpDecisionTree(new DecisionTree)
@@ -137,7 +137,7 @@ void Player::Run()
 	*	Uncomment to trainning
 	*
 	==================================================*/
-	/*
+	///*
 		if (++mpAgent->generalCycleCounter >= 3000)
 		{
 			mpAgent->generalCycleCounter = 0;
@@ -168,7 +168,7 @@ void Player::Run()
 			
 			qTable[curState][9]++;
 			
-			ionInfo  mPositionInfo = mpAgent->Info().GetPositionInfo();
+			PositionInfo  mPositionInfo = mpAgent->Info().GetPositionInfo();
 			Unum closest_tm  = mPositionInfo.GetClosestTeammateToBall();
 
 			switch (mpObserver->GetServerPlayMode())
@@ -258,7 +258,7 @@ void Player::Run()
 			qTableFileOut.write((char *)&qTable, sizeof(qTable));
 			qTableFileOut.close();
 		}
-	*/
+	//*/
 	//END OF QTable AREA
 
 	

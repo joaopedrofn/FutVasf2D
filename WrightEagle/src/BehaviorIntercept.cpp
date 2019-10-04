@@ -62,7 +62,6 @@ BehaviorInterceptExecuter::~BehaviorInterceptExecuter() {
 bool BehaviorInterceptExecuter::Execute(const ActiveBehavior & intercept)
 {
 	Logger::instance().LogIntercept(intercept.mTarget, "@Intercept");
-
 	return Dasher::instance().GetBall(mAgent);
 }
 

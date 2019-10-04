@@ -459,6 +459,8 @@ const vector<Unum> & PositionInfo::GetPlayerWithBallList()
 			}
 		}
 		mPlayerWithBallList_UpdateTime = mpWorldState->CurrentTime();
+		//for (auto i = mPlayerWithBallList.begin(); i != mPlayerWithBallList.end(); i++ )
+		//	cout << (*i) << endl;
 	}
 	return mPlayerWithBallList;
 }
@@ -475,15 +477,18 @@ Unum PositionInfo::GetPlayerWithBall(const double buffer)
 Unum PositionInfo::GetTeammateWithBall()
 {
 	if (mpWorldState->GetBall().GetPosConf() < FLOAT_EPS) {
+		//std::cout << "WTH IS THIS POSCONF?!" << std::endl;
 		return 0;
 	}
 
 	if (GetPlayerWithBallList().empty()){
+		//std::cout << "LIST EMPTY?!" << std::endl;
 		return 0;
 	}
 	else {
         for (unsigned int i = 0; i < GetPlayerWithBallList().size(); ++i){
             if (GetPlayerWithBallList()[i] > 0){
+		//std::cout << "TEAMMATE WITH BALL: " << GetPlayerWithBallList()[i] << std::endl; 
                 return GetPlayerWithBallList()[i];
             }
         }

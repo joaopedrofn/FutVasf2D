@@ -1,0 +1,67 @@
+cd Release; make -j3 all
+make[1]: Entering directory '/home/robocup/Documents/futvasf-git/FutVasf2D/WrightEagle/Release'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/home/robocup/Documents/futvasf-git/FutVasf2D/WrightEagle/Release'
+>>>>>>>>>>>>>>>>>>>>>> WEBase Goalie: 1
+WrightEagle 2012: constructing agent for player 1...
+#WEBase 1: (clang (ver 7 8))
+#WEBase 1: (synch_see)
+>>>>>>>>>>>>>>>>>>>>>> WEBase Player: 9
+>>>>>>>>>>>>>>>>>>>>>> WEBase Player: 10
+WrightEagle 2012: constructing agent for player 2...
+#WEBase 2: (clang (ver 7 8))
+>>>>>>>>>>>>>>>>>>>>>> WEBase Player: 11
+WrightEagle 2012: constructing agent for player 3...
+#WEBase 3: (clang (ver 7 8))
+#WEBase 2: (synch_see)
+WrightEagle 2012: constructing agent for player 4...
+#WEBase 4: (clang (ver 7 8))
+#WEBase 3: (synch_see)
+#WEBase 4: (synch_see)
+#WEBase 2: (say)
+#WEBase 1: (say)
+#WEBase 3: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 3: (say)
+#WEBase 2: (say)
+#WEBase 2: (say)
+#WEBase 1: (say)
+#WEBase 2: (say)
+#WEBase 1: (say)
+#WEBase 2: (say)
+#WEBase 4: (say)
+#WEBase 1: (say)
+>>>>>>>>>>>>>>>>>>>>>> WEBase Coach
+WrightEagle 2012: constructing agent for coach...
+#WEBase Coach: (eye on)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 3: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 4: (say)
+(70:0) WEBase 1 miss a move
+(70:0) WEBase 2 miss a move
+(70:0) WEBase 4 miss a move
+(70:0) WEBase 3 miss a move
+#WEBase 1: (say)
+#WEBase 1: (say)
+#WEBase 1: (say)

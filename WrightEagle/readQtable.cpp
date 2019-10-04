@@ -4,7 +4,7 @@
 
 int main(){
     std::stringstream qTableString;
-	qTableString << "qTable" << 10;
+	qTableString << "qTable" << 4;
 	std::ifstream qTableFileIn(qTableString.str(), std::ios::binary);
 	double qTable[648][10];
 	qTableFileIn.read((char *)&qTable, sizeof(qTable));
