@@ -47,6 +47,7 @@ class WorldState;
 class PositionInfo: public InfoStateBase
 {
 public:
+
 	PositionInfo(WorldState *pWorldState, InfoState *pInfoState);
 
 	const double & GetBallDistToPlayer(Unum unum) const;
@@ -139,6 +140,9 @@ public:
      * @param buffer;
      * return Unum of opponent.
      */
+	bool GetLastWasOpp();
+	void SetLastWasOpp(bool wasOpp);
+
     Unum GetOpponentWithBall(const double buffer);
 
 private:
@@ -176,7 +180,7 @@ private:
 	double mTeammateOffsideLine;
 	double mTeammateOffsideLineConf;
 	double mTeammateOffsideLineSpeed;
-
+	bool lastWasOpp;
 	Unum mOpponentOffsideLineTm;
 	double mOpponentOffsideLine;
 	double mOpponentOffsideLineConf;

@@ -123,6 +123,10 @@ void BehaviorDefensePlanner::Plan(std::list<ActiveBehavior> &behavior_list)
 		//cout << "EPSILON PEQUENO" << endl;
 		actionToTake = greedyEpSelection(actionSpace, minepsilon);
 	}
+
+	if(mPositionInfo.GetOpponentWithBall() != 0){
+		mPositionInfo.SetLastWasOpp(true);
+	}
 	
 	//Uncomment to Trainning
 	///*

@@ -171,6 +171,11 @@ void Player::Run()
 			PositionInfo  mPositionInfo = mpAgent->Info().GetPositionInfo();
 			Unum closest_tm  = mPositionInfo.GetClosestTeammateToBall();
 
+			if(mPositionInfo.GetTeammateWithBall() == mpAgent->GetSelfUnum() && mPositionInfo.GetLastWasOpp() == true){
+				mPositionInfo.SetLastWasOpp(false);
+				std::cout << "reward ->" << mpAgent->GetSelfUnum() << std::endl;
+			}
+
 			switch (mpObserver->GetServerPlayMode())
 			{
 			case SPM_Captured:
